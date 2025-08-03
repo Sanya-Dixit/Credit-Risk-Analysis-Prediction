@@ -1,0 +1,52 @@
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+
+st.set_page_config(page_title="Credit Risk Tableau", layout="wide")
+st.title("Credit Risk Analysis - Tableau Dashboard")
+
+# Load processed data
+@st.cache_data
+def load_data():
+    df = pd.read_csv("../data/processed/processed.csv")
+    # If labels are in separate file:
+    try:
+        y = pd.read_csv("../data/processed/labels.csv")
+        df['loan_status'] = y.values.ravel()
+    except Exception:
+        pass
+    return df
+
+df = load_data()
+
+st.sidebar.header("Filter Data")
+# Example filter: loan_amount range
+min_amt, max_amt = float(df['loan_amnt'].min()), float(df['loan_amnt'].max())
+selected_amt = st.sidebar.slider("Loan Amount Range", min_amt, max_amt, (min_amt, max_amt))
+
+filtered_df = df[(df['loan_amnt'] >= selected_amt[0]) & (df['loan_amnt'] <= selected_amt[1])]
+
+st.subheader("Target Distribution (Loan Status)")
+fig1 = px.histogram(filtered_df, x="loan_status", color="loan_status", 
+                    category_orders={"loan_status": [0,1]}, 
+                    labels={"loan_status": "Loan Status (0=Paid, 1=Default)"})
+st.plotly_chart(fig1, use_container_width=True)
+
+st.subheader("Income vs. Loan Amount")
+fig2 = px.scatter(filtered_df, x="annual_inc", y="loan_amnt", color="loan_status", 
+                  labels={"loan_status": "Loan Status"})
+st.plotly_chart(fig2, use_container_width=True)
+
+st.subheader("Feature Correlation Heatmap")
+corr = filtered_df.corr()
+fig3 = px.imshow(corr, text_auto=True, aspect="auto", title="Correlation Heatmap")
+st.plotly_chart(fig3, use_container_width=True)
+
+st.subheader("Class Imbalance")
+class_counts = filtered_df['loan_status'].value_counts(normalize=True)
+fig4 = px.pie(names=class_counts.index, values=class_counts.values, 
+              title="Class Imbalance (Paid vs Default)")
+st.plotly_chart(fig4, use_container_width=True)
+
+st.markdown("---")
+st.caption("Interactive Tableau-style dashboard for credit risk dataset analysis.")
