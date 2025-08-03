@@ -61,4 +61,21 @@ This project delivers a machine learning-powered solution for assessing the like
 
 ---
 
+## Models Applied
+
+- Logistic Regression
+- Random Forest
+- XGBoost
+
+## Results
+
+- Metrics: ROC AUC, F1 Score, Confusion Matrix
+- Plots: Target distribution, Feature correlation, ROC Curve
+
+## Dashboard Screenshot
+
+![dashboard_screenshot](app/dashboard_screenshot.png)
+
 **Contact:** For questions or collaboration, please reach out via GitHub Issues or email.
+
+
